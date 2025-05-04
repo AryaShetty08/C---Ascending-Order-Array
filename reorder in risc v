@@ -1,0 +1,73 @@
+main:
+li x12, 6 #size of the array
+li x13, 0x0fffffe8 #starting from this memory address
+jal x1, input
+jal x1, reorder
+jal x1, output
+j exit
+input:
+addi x6, x12, 0 #get length of array
+beq x6, x0, done
+li x7, 3 #load first element
+sw x7, 0(x13)#save at memory address
+addi x6, x6, -1 #iterate through length
+beq x6, x0, done
+li x7, 7
+sw x7, 4(x13) #the second element
+addi x6, x6, -1
+beq x6, x0, done
+li x7, 45
+sw x7, 8(x13) #the third element
+addi x6, x6, -1
+beq x6, x0, done
+li x7, 66
+sw x7, 12(x13) #the fourth element
+addi x6, x6, -1
+beq x6, x0, done
+li x7, 80
+sw x7, 16(x13) #the fifth element
+addi x6, x6, -1
+beq x6, x0, done
+li x7, 1
+sw x7, 20(x13) #the sixth element
+addi x6, x6, -1
+j done
+reorder:
+addi x15, x13, 0 #get memory address start, a[0]
+slli x16, x12, 2 #takes length and multiplies by 4
+addi x16, x16, -4 #start x16 at end length
+add x16, x16, x13 # get content at a[length]
+j loop
+loop:
+bge x15, x16, done #check if they are at same position
+jal x31, swap
+addi x15, x15, 4 #go up one element
+addi x16, x16, -4 #go down one element
+j loop
+swap:
+lw x5, 0(x15) #load lower element
+lw x7, 0(x16) #load higher element
+sw x7, 0(x15) #swap positions
+sw x5, 0(x16) #swap positions
+jalr x0, 0(x31)
+output:
+li x10, 1 #for ecall command
+addi x5, x12, 0 #load length
+li x6, 0
+j loop2
+loop2:
+beq x5, x6, done #check if positions are equal
+slli x7, x6, 2 #iterate through array starting with 0
+add x7, x7, x13 #get the position array[i]
+lw x11, 0(x7) #get content of the array element, store in x11 for ecall
+ecall
+addi x6, x6, 1 #to get next element
+j loop2
+done:
+jalr x0, 0(x1)
+exit:
+Test input cases:
+We just changed the length of the array being inputted from 0-6
+Outputs:
+Arrays have been hard coded for this part:
+{3, 7, 45, 66, 80, 1} is the array used for testing
