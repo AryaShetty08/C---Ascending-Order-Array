@@ -1,0 +1,41 @@
+main:
+addi x12, x0, 2 # x value to enter into expression
+jal x1, exp
+addi x10, x0, 1 # will contain the operation for the ecall
+ecall
+j exit2
+exp:
+addi sp, sp, -16
+sw x1, 0(sp)
+sw x12, 8(sp)
+addi x13, x0, 4 # x13 = power
+jal x1, power
+add x11, x6, x0 # stores 1st var
+addi x13, x0, 2
+jal x1, power
+add x12, x6, x0
+addi x14, x0, 6 # x14 = times
+jal x1, times
+add x11, x12, x11 # 2nd var
+lw x12, 8(sp) # restores x-value
+addi x14, x0, 3
+jal x1, times
+add x11, x12, x11 # 3rd var
+addi x11, x11, 4 # 4th var
+lw x1, 0(sp)
+addi sp, sp, 16
+jalr x0, 0(x1)
+power:
+addi x5, x0, 0 # counter
+addi x6, x0, 1 # return value
+loop:
+bge x5, x13, exit
+mul x6, x6, x12
+addi x5, x5, 1
+beq x0, x0, loop
+times:
+mul x12, x12, x14
+jalr x0, 0(x1)
+exit:
+jalr x0, 0(x1)
+exit2:
