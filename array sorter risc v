@@ -1,0 +1,146 @@
+.data
+array: .word 4 37 0 12 1 0 6 # our array
+length: .word 7 # number of elements in our array
+space: .asciiz " "
+newLine: .asciiz "\n"
+oddp: .asciiz "Odds array = "
+evenp: .asciiz "Evens array = "
+zerosp: .asciiz "Zeros array = "
+.text
+main:
+la x10, array #address of array
+la x6, length
+lb x14, 0(x6) #length of array
+addi x6, x0, 0 #counter for odds
+addi x7, x0, 0 #counter for evens
+addi x28, x0, 0 #counter for zeros
+li x8, 10000200 #odds
+addi x11, x8, 0
+li x9, 10000400 #evens
+addi x12, x9, 0
+li x18, 10000800 #zeros
+addi x13, x18, 0
+jal x1, input #start the sorting of arrays
+jal x1, output
+j exit
+input:
+ble x14, x0, back #stop if length is met
+lb x29 0(x10) #element at address
+addi x10, x10, 4 #address for next iteration
+addi x14, x14, -1 #decreases length
+beq x29, x0, zeros #put in zeros array
+blt x29, x0, back #negative numbers
+li x30, 2
+rem x31, x29, x30 #remainder of 0 means its even
+beq x31, x0, evens #put in evens
+beq x0, x0, odds #put in odds
+zeros:
+sb x29, 0(x13) #save to zero array
+addi x13, x13, 4 #increment element
+addi x28, x28, 1 #increment counter
+j inputjal x1, input #start the sorting of arrays
+jal x1, output
+j exit
+input:
+ble x14, x0, back #stop if length is met
+lb x29 0(x10) #element at address
+addi x10, x10, 4 #address for next iteration
+addi x14, x14, -1 #decreases length
+beq x29, x0, zeros #put in zeros array
+blt x29, x0, back #negative numbers
+li x30, 2
+rem x31, x29, x30 #remainder of 0 means its even
+beq x31, x0, evens #put in evens
+beq x0, x0, odds #put in odds
+zeros:
+sb x29, 0(x13) #save to zero array
+addi x13, x13, 4 #increment element
+addi x28, x28, 1 #increment counter
+j input
+evens:
+sb x29, 0(x12) #save to evens array
+addi x12, x12, 4 #increment element
+addi x7, x7, 1 #increment counter
+j input
+odds:
+sb x29, 0(x11) #save to zero array
+addi x11, x11, 4 #increment element
+addi x6, x6, 1 #increment counter
+j input
+back:
+jalr x0 0(x1)
+output:
+li x10, 4
+la x11, oddp #print string for odd starter
+ecall
+#First odd, then even, then zero
+L1:
+bge x0, x6, evenpp
+addi x6, x6, -1
+lb x31, 0(x8)
+li x10, 1
+add x11, x0, x31
+ecall
+li x10, 4
+la x11, space
+ecall
+addi x8, x8, 4
+j L1
+evenpp:
+li x10, 4
+la x11, newLine
+ecall
+la x11, evenp
+ecall
+L2:
+bge x0, x7, zeropp
+addi x7, x7, -1
+lb x31, 0(x9)
+li x10, 1
+add x11, x31, x0
+ecall
+li x10, 4
+la x11, space
+ecall
+addi x9, x9, 4
+j L2
+zeropp:
+li x10, 4
+la x11, newLine
+ecall
+la x11, zerosp
+ecall
+L3:
+bge x0, x28, back
+addi x28, x28, -1
+lb x31, 0(x18)
+li x10, 1
+add x11, x31, x0
+ecall
+li x10, 4
+la x11, space
+ecall
+addi x18, x18, 4
+j L3
+exit:la x11, space
+ecall
+addi x9, x9, 4
+j L2
+zeropp:
+li x10, 4
+la x11, newLine
+ecall
+la x11, zerosp
+ecall
+L3:
+bge x0, x28, back
+addi x28, x28, -1
+lb x31, 0(x18)
+li x10, 1
+add x11, x31, x0
+ecall
+li x10, 4
+la x11, space
+ecall
+addi x18, x18, 4
+j L3
