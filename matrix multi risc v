@@ -1,0 +1,106 @@
+.data
+A: .word 1 2 #creates the first matrix
+.word 3 4
+.word 5 6
+Arows: .word 3
+Acols: .word 2
+B: .word 1 2 #creates second matrix
+.word 3 4
+Brows: .word 2
+Bcols: .word 2
+canNotMultiply: .asciiz "error code 99"
+newLine: .asciiz "\n"
+space: .asciiz " "
+.text
+main:
+la x10, A # address of A
+la x11, B # address of B
+lw x12, Arows # A rows
+lw x13, Brows # B rows
+lw x14, Acols # A cols
+lw x15, Bcols # B cols
+jal x1, multiply # call the multiplication function
+jal x1, printM # print C
+j exit
+multiply:
+bne x14, x13, wrong #checks if columns A is equal to rows of B
+li x9, 0
+li x8, 10000400 # address of C matrix
+addi x5, x8, 0 # get first address
+li x6, 0 # i = 0
+LoopI:
+li x7, 0 # j = 0
+LoopJ:
+li x28, 0 # k = 0
+LoopK:
+mul x29, x6, x14 # i* A columns
+add x29, x29, x28 # [i][0] + k
+slli x29, x29, 2 # to get right amount of bytes
+add x29, x29, x10 # load address of A[][]
+lw x30, 0(x29) # load content
+mul x29, x28, x15 # k* B columns
+add x29, x29, x7 # [k][0] + j
+slli x29, x29, 2 # to get right amount of bytes
+add x29, x29, x11 # load address of B[][]
+lw x31, 0(x29) # load content
+mul x31, x31, x30 # multiply content of A and B
+add x9, x9, x31 # sum += A[i][k]*B[k][j]
+addi x28, x28, 1 # k increment
+blt x28, x13, LoopK # loops when k is less than rows of B
+mul x29, x6, x15 # i * b columns
+add x29, x29, x7 # get [i][j]
+slli x29, x29, 2 # to get right amount of bytes
+add x29, x29, x5 # load address of C[][]
+sw x9, 0(x29) # C[i][j] = sum+= A[i][k]*B[k][j]
+li x9, 0
+addi x7, x7, 1 # j++
+blt x7, x15, LoopJ
+addi x6, x6, 1 # i++
+blt x6, x12, LoopI
+jalr x0, 0(x1)
+printM:
+li x6, 0
+printI:lw x31, 0(x29) # load content
+mul x31, x31, x30 # multiply content of A and B
+add x9, x9, x31 # sum += A[i][k]*B[k][j]
+addi x28, x28, 1 # k increment
+blt x28, x13, LoopK # loops when k is less than rows of B
+mul x29, x6, x15 # i * b columns
+add x29, x29, x7 # get [i][j]
+slli x29, x29, 2 # to get right amount of bytes
+add x29, x29, x5 # load address of C[][]
+sw x9, 0(x29) # C[i][j] = sum+= A[i][k]*B[k][j]
+li x9, 0
+addi x7, x7, 1 # j++
+blt x7, x15, LoopJ
+addi x6, x6, 1 # i++
+blt x6, x12, LoopI
+jalr x0, 0(x1)
+printM:
+li x6, 0
+printI:
+li x7, 0
+printJ:
+li x10, 1
+mul x29, x6, x15 # i*c cols = [i][0] for matrix C
+add x29, x29, x7 # [i][j] for matrix C
+slli x29, x29, 2 # to get right amount of bytes
+add x29, x8, x29 # load address of C[][]
+lw x11, 0(x29) # get content
+ecall
+li x10, 4
+la x11, space
+ecall
+addi x7, x7, 1 # j++
+blt x7, x15, printJ # while j < c columns
+addi x6, x6, 1 # i++
+la x11, newLine
+ecall
+blt x6, x12, printI
+jalr x0, 0(x1)
+wrong:
+li x10, 4
+la x11, canNotMultiply
+ecall
+j exit
+exit:
