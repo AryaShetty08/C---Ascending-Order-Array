@@ -1,0 +1,50 @@
+Computer Architecture and Assembly Lab (14:332:333)
+Spring 2023
+Name:Arya Shetty Net ID:aas445
+Lab 5 Assignment
+RISC-V Assembly
+Due Date: 04/14/2023 -01:59 PM
+1.
+.data
+space: .asciiz " " # space
+.text
+main:
+addi x12, x0, 8
+addi x15, x0, 8
+addi x13, x13, 1
+addi x14, x14, 1
+addi x10, x0, 1
+addi sp, sp, 0
+jal x31, Loop
+jal x30, recursion
+add x11, x0, x13
+ecall
+li x10 4
+la x11 space
+ecall
+li x10 1
+add x11, x0, x14
+ecall
+j end
+Loop:
+beq x12, x0, exit1
+mul x13, x13, x12
+addi x12, x12, -1
+j Loop
+exit1:
+jalr x0, 0(x31)
+recursion:
+beq x15, x0, exit2
+addi sp, sp, -4
+sw x15, 0(sp) #save first call
+addi x15, x15, -1
+jal x0, recursion
+exit2:
+lw x9, 0(sp)
+beq x9, x0, exit3
+addi sp, sp, 4
+mul x14, x14, x9
+j exit2
+exit3:
+jalr x0, 0(x30)
+end:
